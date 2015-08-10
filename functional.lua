@@ -26,4 +26,4 @@ function _G.switch(value)
   end
 end
 
-function _G.void() end
+function _G.void() return nil end

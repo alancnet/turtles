@@ -28,7 +28,7 @@ _G.Stream = (function()
 
   function foldLeft(list, initial)
     return function(folder)
-      function loop(list, accum)
+      local loop; loop = function(list, accum)
         if list.empty then return accum end
         return loop(list.tail(), folder(accum, list.head))
       end
@@ -43,7 +43,7 @@ _G.Stream = (function()
   end
 
   function zipWithIndex(list)
-    function loop(list, i)
+    local loop; loop = function(list, i)
       if list.empty then return list end
       return cons({list.head, i}, function() return loop(list.tail(), i + 1) end)
     end
@@ -52,7 +52,7 @@ _G.Stream = (function()
 
   function fromTable(tbl)
     local max = table.getn(tbl);
-    function loop(i)
+    local loop; loop = function(i)
       if (i > max) then return empty end;
       return cons(tbl[i], function()
         return loop(i + 1);
@@ -102,6 +102,12 @@ _G.Stream = (function()
     return list;
   end
 
+  function slow(list, delay)
+    return list.map(function(value)
+      sleep(delay);
+      return value;
+    end)
+  end
   function asList(list)
     list.map = function(mapper)
       return map(list, mapper);
@@ -109,8 +115,8 @@ _G.Stream = (function()
     list.toString = function()
       return toString(list);
     end
-    list.foldLeft = function(folder)
-      return foldLeft(list, folder);
+    list.foldLeft = function(initial)
+      return foldLeft(list, initial);
     end
     list.reduce = function(reducer)
       return reduce(list, reducer);
@@ -130,6 +136,9 @@ _G.Stream = (function()
     list.forEach = function(action)
       return forEach(list, action);
     end;
+    list.slow = function(delay)
+      return slow(list, delay);
+    end
     return list;
   end
   empty = asList({ empty = true });

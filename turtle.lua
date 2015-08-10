@@ -30,7 +30,12 @@ _G.Turtle = (function()
   function refuelFrom(index, amount)
     if (amount == nil) then amount = 1; end
     turtle.select(index)
-    return turtle.refuel(1)
+    local details = turtle.getItemDetail();
+    if notNil(details) then
+      if not (details.name == "minecraft:sapling") then
+        return turtle.refuel(1)
+      end
+    end
   end
   function refuel(amount)
     if (amount == nil) then amount = 1; end
@@ -42,14 +47,46 @@ _G.Turtle = (function()
       .head
     );
   end
-
+  function deposit(item, count)
+    print('deposit ' .. item .. ' of ' .. tostring(count))
+    if count < 0 then
+      deposit(
+        item,
+        inventory()
+          .filter(function(slot)
+            return equals(item)(slot.item.name);
+          end)
+          .map(function(slot)
+            return slot.item.count;
+          end)
+          .foldLeft(0)(sum)
+          + count
+      )
+    else
+      if (count > 0) then
+        if selectSlotWith(item) then
+          local qty = turtle.getItemDetail().count;
+          local delta;
+          if (qty > count) then delta = count else delta = qty; end
+          if turtle.dropDown(delta) then
+            deposit(item, count - delta);
+          end
+        end
+      end
+    end
+  end
   -- Performs a move action a number of times. Will continue trying until it succeeds.
   -- This prevents the turtle from getting lost when someone stands in front of it.
-  function move(action, length)
+  function move(action, length, blockFn, eachFn)
+    print('Move ' .. action .. ' x ' .. tostring(length))
     local fn = turtle[action];
     if not (type(fn) == 'function') then error('Could not find turtle.' .. action); end
-    Stream.range(1, length).forEach(function()
-      while not fn() do end
+    Stream.range(1, length).forEach(function(i)
+      print('iteration ' .. tostring(i) .. ' of ' .. tostring(length))
+      while not fn() do
+        if notNil(blockFn) then blockFn(action) end;
+      end
+      if notNil(eachFn) then eachFn() end;
     end);
     return Turtle;
   end
@@ -67,6 +104,38 @@ _G.Turtle = (function()
     if (success) then return item.name end
   end
 
+  function lookDown()
+    local success, item = turtle.inspectDown();
+    if (success) then return item.name end
+  end
+
+  function suck()
+    turtle.suckUp()
+    turtle.suckDown();
+    turtle.suck();
+    turtle.turnRight();
+    turtle.suck();
+    turtle.turnRight();
+    turtle.suck();
+    turtle.turnRight();
+    turtle.suck();
+    turtle.turnRight();
+  end
+
+  function circle(r, blockFn, eachFn)
+    turtle.turnRight();
+    move('forward', r, blockFn, eachFn);
+    turtle.turnRight();
+    move('forward', r * 2, blockFn, eachFn);
+    turtle.turnRight();
+    move('forward', r * 2, blockFn, eachFn);
+    turtle.turnRight();
+    move('forward', r * 2, blockFn, eachFn);
+    turtle.turnRight();
+    move('forward', r, blockFn, eachFn);
+    turtle.turnLeft();
+  end
+
   return {
     inventory = inventory,
     findSlot = findSlot,
@@ -75,6 +144,10 @@ _G.Turtle = (function()
     refuelFrom = refuelFrom,
     move = move,
     lookForward = lookForward,
-    lookUp = lookUp
+    lookUp = lookUp,
+    lookDown = lookDown,
+    suck = suck,
+    circle = circle,
+    deposit = deposit
   }
 end)()

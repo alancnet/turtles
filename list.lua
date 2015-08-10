@@ -3,7 +3,7 @@ _G.List = (function()
   local empty;
 
   function toString(list)
-    function loop(list, i)
+    local loop = function(list, i)
       if list.empty then return "" end
       local comma = ''
       local headStr
@@ -29,7 +29,7 @@ _G.List = (function()
 
   function foldLeft(list, initial)
     return function(folder)
-      function loop(list, accum)
+      local loop = function(list, accum)
         if list.empty then return accum end
         return loop(list.tail, folder(accum, list.head))
       end
@@ -43,7 +43,7 @@ _G.List = (function()
   end
 
   function zipWithIndex(list)
-    function loop(list, i)
+    local loop = function(list, i)
       if list.empty then return list end
       return cons({list.head, i}, loop(list.tail, i + 1))
     end
