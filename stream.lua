@@ -42,6 +42,10 @@ _G.Stream = (function()
     return foldLeft(tail, list.head)(reducer);
   end
 
+  function count(list)
+    return foldLeft(list, 0)(function(i) return i + 1; end);
+  end
+
   function zipWithIndex(list)
     local loop; loop = function(list, i)
       if list.empty then return list end
@@ -139,6 +143,9 @@ _G.Stream = (function()
     list.slow = function(delay)
       return slow(list, delay);
     end
+    list.count = function()
+      return count(list);
+    end
     return list;
   end
   empty = asList({ empty = true });
@@ -154,6 +161,7 @@ _G.Stream = (function()
     zipWithIndex = zipWithIndex,
     filter = filter,
     empty = empty,
-    forEach = forEach
+    forEach = forEach,
+    count = count
   }
 end)();

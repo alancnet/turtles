@@ -1,6 +1,6 @@
-local NUMBER_OF_COLUMNS = 2;
-local NUMBER_OF_ROWS = 2;
-local NUMBER_OF_STACKS = 2;
+local NUMBER_OF_COLUMNS = 5;
+local NUMBER_OF_ROWS = 5;
+local NUMBER_OF_STACKS = 5;
 
 os.loadAPI('turtles/functional.lua')
 os.loadAPI('turtles/turtle.lua')

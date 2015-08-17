@@ -1,5 +1,11 @@
 os.loadAPI('turtles/functional.lua');
 _G.Turtle = (function()
+  function checkFuel(level)
+    while (turtle.getFuelLevel() < level) do
+      Turtle.refuel();
+    end
+  end
+
   function inventory()
     return Stream.range(1,16)
     .map(function(index)
@@ -136,6 +142,42 @@ _G.Turtle = (function()
     turtle.turnLeft();
   end
 
+  function digHole(r, blockFn, eachFn, eachRadiiFn)
+    local dig = function()
+      if not isNil(blockFn) then
+        blockFn()
+      end
+      turtle.dig();
+    end
+    local digDown = function()
+      turtle.digDown()
+    end
+    local digAround = function()
+      if not isNil(eachFn) then
+        eachFn()
+      end
+      turtle.digUp();
+      turtle.digDown();
+    end
+
+    Turtle
+      .move('turnRight', 2)
+
+    Stream.range(1, r).forEach(function(radius)
+      if not isNil(eachRadiiFn) then
+        eachRadiiFn()
+      end
+      circle(r - radius, dig, digAround)
+      Turtle
+        .move('turnRight', 2)
+        .move('forward', 1, dig, digAround)
+        .move('turnRight', 2)
+    end)
+
+    Turtle
+      .move('forward', r)
+      .move('turnRight', 2)
+  end
   return {
     inventory = inventory,
     findSlot = findSlot,
@@ -148,6 +190,8 @@ _G.Turtle = (function()
     lookDown = lookDown,
     suck = suck,
     circle = circle,
-    deposit = deposit
+    deposit = deposit,
+    digHole = digHole,
+    checkFuel = checkFuel
   }
 end)()
