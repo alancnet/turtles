@@ -95,14 +95,37 @@ function dropDown()
 end
 dropDir = switchDir(drop, dropUp, dropDown);
 
+function place()
+  return turtle.place();
+end
+function placeUp()
+  return turtle.placeUp();
+end
+function placeDown()
+  return turtle.placeDown();
+end
+placeDir = switchDir(place, placeUp, placeDown);
+
 function dig()
-  if look() then return turtle.dig() end
+  local block = look;
+  if (block == 'minecraft:chest') then
+    return error('Refusing to dig against chest')
+  end
+  if block then return turtle.dig() end
 end
 function digUp()
-  if lookUp() then return turtle.digUp() end
+  local block = lookUp;
+  if (block == 'minecraft:chest') then
+    return error('Refusing to dig against chest')
+  end
+  if block then return turtle.digUp() end
 end
 function digDown()
-  if lookDown() then return turtle.digDown() end
+  local block = lookDown;
+  if (block == 'minecraft:chest') then
+    return error('Refusing to dig against chest')
+  end
+  if block then return turtle.digDown() end
 end
 digDir = switchDir(dig, digUp, digDown)
 
@@ -222,6 +245,18 @@ end
 moveForward = move;
 moveDir = switchDir(move, moveUp, moveDown)
 
+local antiDirTable = {
+  forward = 'back',
+  back = 'forward',
+  left = 'right',
+  right = 'left',
+  up = 'down',
+  down = 'up'
+}
+function antiDir(dir)
+  return antiDirTable[dir];
+end
+
 function mine(count)
   if (count > 0) then
     dig();
@@ -265,7 +300,12 @@ function findSlot(name)
   .take(1)
   .head;
 end
-
+function countInventory(name)
+  return inventory()
+    .filter(function(slot) return slot.item.name == name end)
+    .map(function(slot) return slot.item.count end)
+    .reduce(sum) or 0
+end
 function selectSlotWith(name)
   local slot = findSlot(name);
   if notNil(slot) then
@@ -303,4 +343,54 @@ function refuel(number)
   else
       print( "Fuel level is unlimited" )
   end
+end
+
+
+function mineCircle(r)
+  t.turnRight();
+  t.mine(r);
+  t.turnLeft();
+  t.mine(r * 2);
+  t.turnLeft();
+  t.mine(r * 2);
+  t.turnLeft();
+  t.mine(r * 2);
+  t.turnLeft();
+  t.mine(r);
+  t.turnLeft();
+end
+
+function digHole(r)
+  Stream.range(1, r).forEach(function(radius)
+    t.mineDir('back', 1);
+    mineCircle(radius)
+  end)
+  t.move(r)
+end
+
+function digVein(...)
+  local items = Array.fromTable(arg);
+  local loop; loop = function(dir)
+    local see = t.lookDir(dir);
+    if (items.contains(see)) then
+      t.mineDir(dir, 1);
+      loop('forward');
+      t.turnLeft();
+      loop('forward');
+      t.turnAround();
+      loop('forward');
+      t.turnLeft();
+      loop('up');
+      loop('down');
+      t.moveDir(antiDir(dir), 1)
+    end
+  end
+  loop('forward');
+  t.turnLeft();
+  loop('forward');
+  t.turnAround();
+  loop('forward');
+  t.turnLeft();
+  loop('up');
+  loop('down');
 end

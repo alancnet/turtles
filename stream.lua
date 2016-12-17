@@ -37,6 +37,7 @@ _G.Stream = (function()
   end
 
   function reduce(list, reducer)
+    if list.empty then return nil end;
     local tail = list.tail();
     if tail.empty then return list.head end
     return foldLeft(tail, list.head)(reducer);
