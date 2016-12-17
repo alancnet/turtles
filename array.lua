@@ -128,6 +128,18 @@ _G.Array = (function()
       end
       return accumulator
     end
+    array.indexOf = function(other)
+      local i, v
+      for i, v in ipairs(array) do
+        if v == other then
+          return i
+        end
+      end
+      return nil
+    end
+    array.contains = function(other)
+      return not not array.indexOf(other)
+    end
     return update(array)
   end
 

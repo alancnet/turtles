@@ -8,8 +8,8 @@ local function switchDir(forward, up, down, back, left, right)
   return function(dir, ...)
     return switch(dir){
       forward = function() return forward(unpack(arg)) end,
-      up = function() return forward(unpack(arg)) end,
-      down = function() return forward(unpack(arg)) end,
+      up = function() return up(unpack(arg)) end,
+      down = function() return down(unpack(arg)) end,
       back = function()
         if back then return back(unpack(arg)) end
         turnAround();
@@ -73,6 +73,27 @@ function lookDown()
 end
 lookDir = switchDir(look, lookUp, lookDown);
 
+function suck()
+  return turtle.suck();
+end
+function suckUp()
+  return turtle.suckUp();
+end
+function suckDown()
+  return turtle.suckDown();
+end
+suckDir = switchDir(suck, suckUp, suckDown);
+
+function drop()
+  return turtle.drop();
+end
+function dropUp()
+  return turtle.dropUp();
+end
+function dropDown()
+  return turtle.dropDown();
+end
+dropDir = switchDir(drop, dropUp, dropDown);
 
 function dig()
   if look() then return turtle.dig() end
