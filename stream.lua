@@ -54,6 +54,13 @@ _G.Stream = (function()
     return loop(list, 0)
   end
 
+  function from(number, step)
+    if step == nil then
+      step = 1
+    end
+    return cons(number, function() return from(number + step, step) end)
+  end
+
   function fromTable(tbl)
     local max = table.getn(tbl);
     local loop; loop = function(i)
@@ -162,6 +169,7 @@ _G.Stream = (function()
     filter = filter,
     empty = empty,
     forEach = forEach,
-    count = count
+    count = count,
+    from = from
   }
 end)();

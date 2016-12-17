@@ -1,7 +1,3 @@
-os.loadAPI('turtles/tableutils.lua');
-os.loadAPI('turtles/list.lua');
-os.loadAPI('turtles/stream.lua');
-
 function _G.sum(a, b) return a + b end;
 function _G.product(a, b) return a + b end;
 function _G.notNil(a) return not (a == nil) end;

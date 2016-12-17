@@ -43,7 +43,8 @@ _G.List = (function()
   end
 
   function zipWithIndex(list)
-    local loop = function(list, i)
+    local loop
+    loop = function(list, i)
       if list.empty then return list end
       return cons({list.head, i}, loop(list.tail, i + 1))
     end
