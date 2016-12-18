@@ -38,6 +38,7 @@ _G.List = (function()
   end
 
   function reduce(list, reducer)
+    if list.empty then return nil
     if list.tail.empty then return list.head end
     return foldLeft(list.tail, list.head)(reducer);
   end
