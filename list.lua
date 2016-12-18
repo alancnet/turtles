@@ -29,7 +29,7 @@ _G.List = (function()
 
   function foldLeft(list, initial)
     return function(folder)
-      local loop = function(list, accum)
+      local loop; loop = function(list, accum)
         if list.empty then return accum end
         return loop(list.tail, folder(accum, list.head))
       end
